@@ -5,10 +5,7 @@ export interface WorksheetCellAddress {
 
 export interface Worksheet {
   readonly maxCellAddress: Readonly<WorksheetCellAddress>
-  activeCellAddress: {
-    rowIndex: number
-    columnIndex: number
-  }
+  activeCellAddress: WorksheetCellAddress
   cellContents: string[][]  // cellContents[rowIndex][columnIndex]: string
 }
 
