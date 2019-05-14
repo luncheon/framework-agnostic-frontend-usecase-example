@@ -1,0 +1,51 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  color: #444;
+  line-height: 1.15;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+input {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.worksheet {
+  table-layout: fixed;
+  width: fit-content;
+}
+.worksheet > thead > tr > th,
+.worksheet > tbody > tr > th {
+  background-color: #eee;
+}
+.worksheet > thead > tr > th,
+.worksheet > tbody > tr > th,
+.worksheet > tbody > tr > td {
+  width: 6em;
+  border: 1px solid #ccc;
+  padding: 1px;
+}
+.worksheet > tbody > tr > td.active {
+  border: 2px solid #48f;
+  padding: 0;
+}
+.worksheet > tbody > tr > td > input {
+  width: 100%;
+  border: none;
+  outline: none;
+}
