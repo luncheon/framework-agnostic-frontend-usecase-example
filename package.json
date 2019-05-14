@@ -9,7 +9,12 @@
     "build:angular-app": "cd apps/angular-app && npm run build && copyup \"dist/**/*\" ../../docs/angular-app/",
     "build:react-app": "cd apps/react-app && npm run build && copyup \"build/**/*\" ../../docs/react-app/",
     "build:vuejs-app": "cd apps/vuejs-app && npm run build && copyup \"dist/**/*\" ../../docs/vuejs-app/",
-    "clean": "rimraf docs/*/"
+    "clean": "rimraf docs/",
+    "postinstall": "npm-run-all -p ci:*",
+    "ci:usecase": "cd usecase && npm ci",
+    "ci:angular-app": "cd apps/angular-app && npm ci",
+    "ci:react-app": "cd apps/react-app && npm ci",
+    "ci:vuejs-app": "cd apps/vuejs-app && npm ci"
   },
   "devDependencies": {
     "copyfiles": "^2.1.0",
