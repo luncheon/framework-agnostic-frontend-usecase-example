@@ -109,7 +109,8 @@ export class WorksheetService {
   * 状態ツリーの中に同じオブジェクトへの参照が複数ある場合でも、同じオブジェクトへの参照としては扱われません。
   * [詳細は immer の README を参照してください。](https://github.com/immerjs/immer#pitfalls)
 * Vue.js の制限
-  * [Vue.js 2.x は配列要素の差し替え `array[index] = value` に対してリアクティブではありません](https://jp.vuejs.org/v2/guide/list.html#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A0%85)）。
+  * Vue.js 2.x は配列要素の差し替え `array[index] = value` に対してリアクティブではありません
+    * [リストレンダリング — Vue.js #注意事項](https://jp.vuejs.org/v2/guide/list.html#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A0%85)
     * これについて私はとりあえず Vue.js 3.x を待ちます。
   * Vue.js で扱うデータは immer に渡せません。
     * [Why can't drafts have computed properties? · Issue #317 · immerjs/immer](https://github.com/immerjs/immer/issues/317)
