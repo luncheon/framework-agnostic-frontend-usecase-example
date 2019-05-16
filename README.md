@@ -16,7 +16,15 @@ immer を使うのはロジックの利用側であって、ロジック側は i
 * [Vue.js (Vue.observable)](https://luncheon.github.io/framework-agnostic-frontend-usecase-example/vuejs-app/)）
 
 
+## 背景
+
+ブログに書く予定です。
+<!-- [[Web フロントエンド] 状態更新ロジックをフレームワークから独立させる | Kabuku Developers Blog](https://www.kabuku.co.jp/developers/framework-agnostic-state-modification) -->
+
+
 ## 解説
+
+### はじめに
 
 * まずはこの例で扱う状態オブジェクトの型を紹介しておきます。  
 （ただの表です。この例自体はおもしろいものではありません。あしからず。）
@@ -34,18 +42,18 @@ export interface WorksheetCellAddress {
 }
 ```
 
-* 状態変更ロジックでは、状態オブジェクトがミュータブルである前提でロジックを書きます。
-* 状態変更ロジックを記述するクラスは「状態を変更する関数を受け取って実際の更新処理を行う関数」を受け取ります（状態の更新処理を抽象化します）。状態の変更はこの関数を介して行います。
+### 状態変更ロジック
+
+* 状態変更ロジックを記述するクラスは「状態を変更するロジック（関数）を受け取って実際の更新処理を行う関数 `update: (mutate: (state: Worksheet) => void) => unknown`」を受け取ります（状態の更新処理を抽象化します）。
+* 状態の変更メソッドでは前述の「実際の更新処理を行う関数 `update()`」に「オブジェクトの変更ロジック」を渡します `update(state => state.xxx.yyy = zzz)`。
+* このクラスは状態そのものを保持しません。状態の持ち方を利用側の自由にするためです。
 
 [usecase/src/WorksheetOperations.ts](https://github.com/luncheon/framework-agnostic-frontend-usecase-example/blob/master/usecase/src/WorksheetOperations.ts)
 
 ```typescript
 export class WorksheetOperations {
-  // 慣れないと型が多少複雑に見えるかもしれません。後述する利用側のコードを読む方が分かりやすいと思います。
-  // 「状態を変更する関数 `mutate: (state: Worksheet) => void` を受け取って実際の更新処理を行う関数 `update`」を受け取っています。
   constructor(private readonly update: (mutate: (state: Worksheet) => void) => unknown) {}
 
-  // 状態を更新する際には、状態オブジェクトを直接変更する関数を更新関数に渡します。解釈は更新関数側でなんとでもできます。
   setActiveCellAddress(rowIndex?: number, columnIndex?: number): this {
     this.update(({ maxCellAddress, activeCellAddress }) => {
       if (typeof rowIndex === 'number' && rowIndex >= 0 && rowIndex <= maxCellAddress.rowIndex) {
@@ -60,7 +68,10 @@ export class WorksheetOperations {
 }
 ```
 
-* 状態オブジェクトがミュータブルな前提で使えるフレームワークでは、「状態を変更する関数を受け取って実際の更新処理を行う関数」として単純に `mutate => mutate(state)` を使います。
+### Vue.js で利用する場合
+
+* Vue.js のように、状態オブジェクトがミュータブルな前提で使えるフレームワークでは、 `update()` 関数として単純に `mutate => mutate(state)` を使います。
+  * `state.xxx.yyy = zzz` のような普通の変更処理が実行されて、フレームワークが勝手に（Vue.js 2.x なら setter, 3.x なら proxy を介して）反応します。
 
 [apps/vuejs-app/src/Worksheet.vue#L43](https://github.com/luncheon/framework-agnostic-frontend-usecase-example/blob/master/apps/vuejs-app/src/Worksheet.vue#L43)
 
@@ -69,8 +80,11 @@ export class WorksheetOperations {
   const worksheetOperations = new WorksheetOperations(mutate => mutate(worksheet))
 ```
 
-* 状態オブジェクトがイミュータブルな前提で使うフレームワークでは、「状態を変更する関数を受け取って実際の更新処理を行う関数」として、 immer の `produce()` 関数を介した `mutate => state = produce(state, mutate)` のような関数を使います。
-  * `produce(state, mutate)` は `produce(mutate)(state)` とも記述できるので、 React では `mutate => setState(state => produce(state, mutate))` の代わりに `mutate => setState(produce(mutate))` と記述できます。
+### React (useState()) で利用する場合
+
+* 状態オブジェクトがイミュータブルな前提で使うフレームワークでは、 `update()` 関数として immer の `produce()` 関数を介した `mutate => state = produce(state, mutate)` のような関数を渡します。
+  * `produce(state => state.xxx.yyy = zzz)` によって新しいオブジェクトが生成されます。
+* `produce(state, mutate)` は `produce(mutate)(state)` とも記述できるので、 React では `mutate => setState(state => produce(state, mutate))` の代わりに `mutate => setState(produce(mutate))` と記述できます。
 
 [apps/react-app/src/Worksheet.tsx](https://github.com/luncheon/framework-agnostic-frontend-usecase-example/blob/master/apps/react-app/src/Worksheet.tsx#L96)
 
@@ -84,7 +98,9 @@ export default () => {
 }
 ```
 
-* 状態を rxjs の BehaviorSubject として持つ場合も immer を介します。
+### Angular (rxjs) で利用する場合
+
+* 状態を rxjs の `BehaviorSubject` として持つ場合も、状態をイミュータブルとして扱うので、 React 同様 immer を介します。
 
 [apps/angular-app/src/app/worksheet.services.ts](https://github.com/luncheon/framework-agnostic-frontend-usecase-example/blob/master/apps/angular-app/src/app/worksheet.services.ts#L11)
 
@@ -99,7 +115,7 @@ export class WorksheetService {
 }
 ```
 
-* いずれの例でも、 `worksheetOperations.setActiveCellAddress(rowIndx, columnIndex)` を同じように呼べば、適切に状態が更新（変更または生成）されて画面に反映されます。
+* 以上いずれのフレームワークでも、 `worksheetOperations.setActiveCellAddress(rowIndx, columnIndex)` を呼ぶことで状態が更新（変更または生成）されて画面に反映されます。
 
 
 ## おとしあな・制限
