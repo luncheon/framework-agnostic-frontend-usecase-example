@@ -70,7 +70,7 @@ export class WorksheetOperations {
 
 ### Vue.js で利用する場合
 
-* Vue.js のように、状態オブジェクトがミュータブルな前提で使えるフレームワークでは、 `update()` 関数として単純に `mutate => mutate(state)` を使います。
+* Vue.js のように、状態オブジェクトがミュータブルな前提で使えるフレームワークでは、 `update()` 関数として単純に `mutate => mutate(state)` を渡します。
   * `state.xxx.yyy = zzz` のような普通の変更処理が実行されて、フレームワークが勝手に（Vue.js 2.x なら setter, 3.x なら proxy を介して）反応します。
 
 [apps/vuejs-app/src/Worksheet.vue#L43](https://github.com/luncheon/framework-agnostic-frontend-usecase-example/blob/master/apps/vuejs-app/src/Worksheet.vue#L43)
@@ -87,10 +87,10 @@ export default Vue.extend({
 }
 ```
 
-### React (useState()) で memo() されたコンポーネントに利用する場合
+### React.PureComponent （あるいは React.memo() されたコンポーネント）の props に利用する場合
 
-* 状態オブジェクトがイミュータブルな前提で使うフレームワークでは、 `update()` 関数として immer の `produce()` 関数を介した `mutate => state = produce(state, mutate)` のような関数を渡します。
-  * `produce(state => state.xxx.yyy = zzz)` によって新しいオブジェクトが生成されます。
+* 状態オブジェクトがイミュータブルな前提で使う際には、 `update()` 関数として immer の `produce()` 関数を介した `mutate => setState(state => produce(state, mutate))` のような関数を渡します。
+  * `produce(state, state => state.xxx.yyy = zzz)` が新しいオブジェクトを生成してくれるので、返ってきたオブジェクトを保持するだけです。
 * `produce(state, mutate)` は `produce(mutate)(state)` とも記述できるので、 React では `mutate => setState(state => produce(state, mutate))` の代わりに `mutate => setState(produce(mutate))` と記述できます。
 
 [apps/react-app/src/Worksheet.tsx](https://github.com/luncheon/framework-agnostic-frontend-usecase-example/blob/master/apps/react-app/src/Worksheet.tsx#L96)
