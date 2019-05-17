@@ -11,19 +11,14 @@ table.worksheet
     @click="worksheetOperations.setActiveCellAddress(+$event.target.dataset.rowIndex, +$event.target.dataset.columnIndex)"
     @input="worksheetOperations.setActiveCellContent($event.target.value)"
   )
-    tr(
+    AppWorksheetRow(
       v-for="(_, rowIndex) in worksheet.maxCellAddress.rowIndex + 1"
       :key="rowIndex"
+      :rowIndex="rowIndex"
+      :row="worksheet.cellContents[rowIndex]"
+      :activeCellIndex="rowIndex === worksheet.activeCellAddress.rowIndex ? worksheet.activeCellAddress.columnIndex : undefined"
+      :maxColumnIndex="worksheet.maxCellAddress.columnIndex"
     )
-      th {{rowIndex}}
-      AppWorksheetCell(
-        v-for="(_, columnIndex) in worksheet.maxCellAddress.columnIndex + 1"
-        :key="columnIndex"
-        :rowIndex="rowIndex"
-        :columnIndex="columnIndex"
-        :active="rowIndex === worksheet.activeCellAddress.rowIndex && columnIndex === worksheet.activeCellAddress.columnIndex"
-        :content="worksheet.cellContents[rowIndex] && worksheet.cellContents[rowIndex][columnIndex]"
-      )
 </template>
 
 <script lang="ts">
