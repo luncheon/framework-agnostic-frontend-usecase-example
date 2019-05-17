@@ -40,7 +40,9 @@ export default Vue.extend({
   components: { WorksheetCell },
   data() {
     const worksheet = Vue.observable(createWorksheet())
-    const worksheetOperations = new WorksheetOperations(mutate => mutate(worksheet))
+    const worksheetOperations = new WorksheetOperations(
+      mutate => mutate(worksheet)
+    )
     const worksheetKeyEventHandler = createWorksheetKeyEventHandler(worksheetOperations)
     return { worksheet, worksheetOperations, worksheetKeyEventHandler }
   },

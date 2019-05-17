@@ -481,8 +481,8 @@ __webpack_require__.r(__webpack_exports__);
 let WorksheetService = class WorksheetService {
     constructor() {
         this._worksheet = new rxjs__WEBPACK_IMPORTED_MODULE_3__["BehaviorSubject"](Object(_common_createWorksheet__WEBPACK_IMPORTED_MODULE_5__["default"])());
-        this.worksheet$ = this._worksheet.asObservable();
         this.worksheetOperations = new _usecase__WEBPACK_IMPORTED_MODULE_4__["WorksheetOperations"](mutate => this._worksheet.next(Object(immer__WEBPACK_IMPORTED_MODULE_2__["default"])(this._worksheet.value, mutate)));
+        this.worksheet$ = this._worksheet.asObservable();
     }
 };
 WorksheetService = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([

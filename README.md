@@ -26,14 +26,14 @@ immer を使うのはロジックの利用側であって、ロジック側は i
 
 ### はじめに
 
-* まずはこの例で扱う状態オブジェクトの型を紹介しておきます。  
-（ただの表です。この例自体はおもしろいものではありません。あしからず。）
+スプレッドシートを扱うアプリで、アクティブセルを更新する処理を例にします。
+
+まずはこの例で扱う状態オブジェクトの型定義を紹介しておきます。
 
 ```typescript
 export interface Worksheet {
   readonly maxCellAddress: Readonly<WorksheetCellAddress>
   activeCellAddress: WorksheetCellAddress
-  cellContents: string[][]  // cellContents[rowIndex]?.[columnIndex]: string
 }
 
 export interface WorksheetCellAddress {
@@ -76,11 +76,18 @@ export class WorksheetOperations {
 [apps/vuejs-app/src/Worksheet.vue#L43](https://github.com/luncheon/framework-agnostic-frontend-usecase-example/blob/master/apps/vuejs-app/src/Worksheet.vue#L43)
 
 ```typescript
-  const worksheet = Vue.observable(createWorksheet())
-  const worksheetOperations = new WorksheetOperations(mutate => mutate(worksheet))
+export default Vue.extend({
+  data() {
+    const worksheet = Vue.observable(createWorksheet())
+    const worksheetOperations = new WorksheetOperations(
+      mutate => mutate(worksheet)
+    )
+    return { worksheet, worksheetOperations }
+  }
+}
 ```
 
-### React (useState()) で利用する場合
+### React (useState()) で memo() されたコンポーネントに利用する場合
 
 * 状態オブジェクトがイミュータブルな前提で使うフレームワークでは、 `update()` 関数として immer の `produce()` 関数を介した `mutate => state = produce(state, mutate)` のような関数を渡します。
   * `produce(state => state.xxx.yyy = zzz)` によって新しいオブジェクトが生成されます。
@@ -93,8 +100,15 @@ import produce from 'immer'
 
 export default () => {
   const [state, setState] = React.useState(createWorksheet())
-  const worksheetOperations = new WorksheetOperations(mutate => setState(produce(mutate)))
-  /* ... */
+  const worksheetOperations = new WorksheetOperations(
+    mutate => setState(produce(mutate))
+  )
+  return (
+    <WorksheetTableMemoized
+      worksheet={state}
+      worksheetOperations={worksheetOperations}
+    />
+  )
 }
 ```
 
@@ -111,7 +125,9 @@ import { BehaviorSubject } from 'rxjs'
 @Injectable()
 export class WorksheetService {
   private readonly _worksheet = new BehaviorSubject<Worksheet>(createWorksheet())
-  readonly worksheetOperations = new WorksheetOperations(mutate => this._worksheet.next(produce(this._worksheet.value, mutate)))
+  readonly worksheetOperations = new WorksheetOperations(
+    mutate => this._worksheet.next(produce(this._worksheet.value, mutate))
+  )
 }
 ```
 

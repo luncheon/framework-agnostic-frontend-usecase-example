@@ -450,8 +450,8 @@ var WorksheetService = /** @class */ (function () {
     function WorksheetService() {
         var _this = this;
         this._worksheet = new rxjs__WEBPACK_IMPORTED_MODULE_3__["BehaviorSubject"](Object(_common_createWorksheet__WEBPACK_IMPORTED_MODULE_5__["default"])());
-        this.worksheet$ = this._worksheet.asObservable();
         this.worksheetOperations = new _usecase__WEBPACK_IMPORTED_MODULE_4__["WorksheetOperations"](function (mutate) { return _this._worksheet.next(Object(immer__WEBPACK_IMPORTED_MODULE_2__["default"])(_this._worksheet.value, mutate)); });
+        this.worksheet$ = this._worksheet.asObservable();
     }
     WorksheetService = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Injectable"])()
