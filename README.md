@@ -73,10 +73,10 @@ export class WorksheetOperations {
 * Vue.js のように、状態オブジェクトがミュータブルな前提で使えるフレームワークでは、 `update()` 関数として単純に `mutate => mutate(state)` を渡します。
   * `state.xxx.yyy = zzz` のような普通の変更処理が実行されて、フレームワークが勝手に（Vue.js 2.x なら setter, 3.x なら proxy を介して）反応します。
 
-[apps/vuejs-app/src/Worksheet.vue#L43](https://github.com/luncheon/framework-agnostic-frontend-usecase-example/blob/master/apps/vuejs-app/src/Worksheet.vue#L43)
+[apps/vuejs-app/src/components/AppWorksheet.vue](https://github.com/luncheon/framework-agnostic-frontend-usecase-example/blob/master/apps/vuejs-app/src/components/AppWorksheet.vue)
 
 ```typescript
-export default Vue.extend({
+export default Vue.component(filename, {
   data() {
     const worksheet = Vue.observable(createWorksheet())
     const worksheetOperations = new WorksheetOperations(

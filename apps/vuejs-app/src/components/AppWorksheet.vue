@@ -16,7 +16,7 @@ table.worksheet
       :key="rowIndex"
     )
       th {{rowIndex}}
-      WorksheetCell(
+      AppWorksheetCell(
         v-for="(_, columnIndex) in worksheet.maxCellAddress.columnIndex + 1"
         :key="columnIndex"
         :rowIndex="rowIndex"
@@ -27,17 +27,16 @@ table.worksheet
 </template>
 
 <script lang="ts">
+import { filename } from 'paths.macro'
 import Vue from 'vue'
-import { WorksheetOperations } from '../../../usecase'
-import createWorksheet from '../../common/createWorksheet'
-import createWorksheetKeyEventHandler from '../../common/createWorksheetKeyEventHandler'
-import WorksheetCell from './WorksheetCell.vue'
+import { WorksheetOperations } from '@/../../../usecase'
+import createWorksheet from '@/../../common/createWorksheet'
+import createWorksheetKeyEventHandler from '@/../../common/createWorksheetKeyEventHandler'
 
 // Vue.js 2.x は配列要素の変更を検知できないので、現状の WorksheetOperations#setActiveCellContent() の実装では本当はダメです。
 // ただし現状は入力確定時に必ずアクティブセルも合わせて変更されるために正しく動いているように見えてしまいます。
 // Vue.js 3.x では配列要素の変更も検知できるようになるはずなので、このサンプルでは時間が解決することを信じて放置します。
-export default Vue.extend({
-  components: { WorksheetCell },
+export default Vue.component(filename, {
   data() {
     const worksheet = Vue.observable(createWorksheet())
     const worksheetOperations = new WorksheetOperations(

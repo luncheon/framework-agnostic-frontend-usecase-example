@@ -13,21 +13,15 @@ td(
 </template>
 
 <script lang="ts">
+import { filename } from 'paths.macro'
 import Vue from 'vue'
 
-export default Vue.extend({
+export default Vue.component(filename, {
   props: {
     active: { type: Boolean, required: true },
     rowIndex: { type: Number, required: true },
     columnIndex: { type: Number, required: true },
     content: String,
-  },
-  directives: {
-    autofocus: {
-      inserted(el) {
-        el.focus()
-      },
-    },
   },
 })
 </script>
