@@ -151,3 +151,54 @@ export class WorksheetService {
   * Vue.js で扱うデータは immer に渡せません。
     * [Why can't drafts have computed properties? · Issue #317 · immerjs/immer](https://github.com/immerjs/immer/issues/317)
     * Vue.js 3.x でもダメかもしれませんが、おそらく immer を介す理由がなくなります。
+
+
+## スケールアップ： 状態オブジェクトの統合
+
+複数の状態を統合したくなったら、次の `CombinedState`／`CombinedStateOperation` のような形でシンプルに実現できます。
+
+[usecase/src/__test__/CombinedState.spec.ts](https://github.com/luncheon/framework-agnostic-frontend-usecase-example/blob/master/usecase/src/__test__/CombinedState.spec.ts)
+
+```typescript
+type Update<T> = (mutate: (state: T) => void) => unknown
+```
+
+```typescript
+interface CombinedState {
+  first: FirstState
+  second: SecondState
+}
+
+class CombinedStateOperation {
+  readonly first = new FirstStateOperation(mutate => this.update(state => mutate(state.first)))
+  readonly second = new SecondStateOperation(mutate => this.update(state => mutate(state.second)))
+
+  constructor(private readonly update: Update<CombinedState>) {}
+}
+```
+
+```typescript
+interface FirstState {
+  x: number
+}
+
+class FirstStateOperation {
+  constructor(private readonly update: Update<FirstState>) {}
+
+  setX(x: number) {
+    this.update(state => { state.x = x })
+  }
+}
+```
+
+```typescript
+interface SecondState {
+  /* ... */
+}
+
+class SecondStateOperation {
+  constructor(private readonly update: Update<SecondState>) {}
+
+  /* ... */
+}
+```
