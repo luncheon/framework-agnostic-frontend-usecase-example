@@ -8,7 +8,7 @@ import createWorksheet from '../../../common/createWorksheet'
 export class WorksheetService {
   private readonly _worksheet = new BehaviorSubject<Worksheet>(createWorksheet())
   readonly worksheetOperations = new WorksheetOperations(
-    mutate => this._worksheet.next(produce(this._worksheet.value, mutate))
+    mutate => this._worksheet.next(produce(this._worksheet.value, mutate)),
   )
   readonly worksheet$ = this._worksheet.asObservable()
 }

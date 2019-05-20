@@ -1,6 +1,4 @@
 import { Component, ChangeDetectionStrategy, OnInit, OnDestroy } from '@angular/core'
-import { Observable } from 'rxjs'
-import { map, shareReplay, pluck, distinctUntilChanged, take, tap } from 'rxjs/operators'
 import { WorksheetService } from './worksheet.services'
 import createWorksheetKeyEventHandler from '../../../common/createWorksheetKeyEventHandler'
 
