@@ -157,7 +157,7 @@ export class WorksheetService {
 
 複数の状態を統合したくなったら、次の `CombinedState`／`CombinedStateOperation` のような形でシンプルに実現できます。
 
-[usecase/src/__test__/CombinedState.spec.ts](https://github.com/luncheon/framework-agnostic-frontend-usecase-example/blob/master/usecase/src/__test__/CombinedState.spec.ts)
+[usecase/src/\_\_test\_\_/CombinedState.spec.ts](https://github.com/luncheon/framework-agnostic-frontend-usecase-example/blob/master/usecase/src/__test__/CombinedState.spec.ts)
 
 ```typescript
 type Update<T> = (mutate: (state: T) => void) => unknown
