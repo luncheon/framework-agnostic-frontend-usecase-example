@@ -138,6 +138,10 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ __webpack_exports__["default"] = ((operations) => (event) => {
+    // ignore IME conversion
+    if (event.keyCode === 229) {
+        return;
+    }
     switch (event.key) {
         case 'ArrowDown':
             event.preventDefault();

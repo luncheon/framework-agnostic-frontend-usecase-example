@@ -1,6 +1,10 @@
 import { WorksheetOperations } from '../../usecase'
 
 export default (operations: WorksheetOperations) => (event: KeyboardEvent) => {
+  // ignore IME conversion
+  if (event.keyCode === 229) {
+    return
+  }
   switch (event.key) {
     case 'ArrowDown':
       event.preventDefault()
