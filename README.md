@@ -1,34 +1,38 @@
-# フレームワークによらない状態変更ロジックの実装例です。
+# フレームワークにとらわれない状態変更ロジックの実装例です。
 
-**状態の持ち方によらない状態変更ロジック**と言った方がより適切かもしれません。
+（**状態の持ち方にとらわれない状態変更ロジック**と言った方がより適切かもしれません。）
 
-Angular, React.PureComponent, React.Component, Vue.js, Redux, rxjs, MobX など、利用するフレームワークによって状態の持ち方や監視方法が異なりますが、状態変更ロジックはこれらフレームワークによらない書き方ができるはずです。
+Angular, React.PureComponent, React.Component, Vue.js, Redux, rxjs, MobX など、利用するフレームワークによって状態の持ち方や監視方法が異なりますが、少なくとも**状態変更ロジックはフレームワークにとらわれない書き方ができる**と考えます。
 
-この考えを現実にしてくれるのが [immer](https://github.com/immerjs/immer) です。
-
-immer を使うのはロジックの利用側であって、ロジック側は immer を使いません。  
-ただし、状態ツリー内に循環参照を含められらないなど immer に制限があるので、 immer を介して利用されることを想定しておく必要はあります。
-
-このリポジトリでは、単一の状態変更ロジックを複数の異なる状態管理方法で使い回して、それぞれ同一の挙動をするアプリを作成しています。
+このリポジトリはそのサンプル実装です。ひとつの状態変更ロジックを異なる複数のフレームワークで使い回して、それぞれ同一の挙動をするアプリを作成しています。
 
 * [Angular (rxjs + immer)](https://luncheon.github.io/framework-agnostic-frontend-usecase-example/angular-app/)
 * [React (useState() + immer)](https://luncheon.github.io/framework-agnostic-frontend-usecase-example/react-app/)
 * [Vue.js (Vue.observable)](https://luncheon.github.io/framework-agnostic-frontend-usecase-example/vuejs-app/)）
 
+状態オブジェクトのイミュータビリティを抽象化するために immer を利用しています。
+
+* [immerjs/immer: Create the next immutable state by mutating the current one](https://github.com/immerjs/immer)
+
 
 ## 背景
 
-ブログに書く予定です。
-<!-- [[Web フロントエンド] 状態更新ロジックをフレームワークから独立させる | Kabuku Developers Blog](https://www.kabuku.co.jp/developers/framework-agnostic-state-modification) -->
+ブログ記事を参照してください。
+
+* [[Web フロントエンド] 状態更新ロジックをフレームワークから独立させる | Kabuku Developers Blog](https://www.kabuku.co.jp/developers/framework-agnostic-state-modification)
 
 
 ## 解説
 
 ### はじめに
 
-スプレッドシートを扱うアプリで、アクティブセルを更新する処理を例にします。
+（コードはシンプルなはずですが、解説が読みづらいせいで難解に感じるかもしれません。すみません。）
+
+スプレッドシートを扱うアプリで、アクティブセルを更新する処理を例にしています。
 
 まずはこの例で扱う状態オブジェクトの型定義を紹介しておきます。
+
+[usecase/src/Worksheet.ts](https://github.com/luncheon/framework-agnostic-frontend-usecase-example/blob/master/usecase/src/Worksheet.ts)
 
 ```typescript
 export interface Worksheet {
@@ -93,7 +97,7 @@ export default Vue.component(filename, {
   * `produce(state, state => state.xxx.yyy = zzz)` が新しいオブジェクトを生成してくれるので、返ってきたオブジェクトを保持するだけです。
 * `produce(state, mutate)` は `produce(mutate)(state)` とも記述できるので、 React では `mutate => setState(state => produce(state, mutate))` の代わりに `mutate => setState(produce(mutate))` と記述できます。
 
-[apps/react-app/src/Worksheet.tsx](https://github.com/luncheon/framework-agnostic-frontend-usecase-example/blob/master/apps/react-app/src/Worksheet.tsx#L96)
+[apps/react-app/src/Worksheet.tsx](https://github.com/luncheon/framework-agnostic-frontend-usecase-example/blob/master/apps/react-app/src/Worksheet.tsx)
 
 ```typescript
 import produce from 'immer'
@@ -116,7 +120,7 @@ export default () => {
 
 * 状態を rxjs の `BehaviorSubject` として持つ場合も、状態をイミュータブルとして扱うので、 React 同様 immer を介します。
 
-[apps/angular-app/src/app/worksheet.services.ts](https://github.com/luncheon/framework-agnostic-frontend-usecase-example/blob/master/apps/angular-app/src/app/worksheet.services.ts#L11)
+[apps/angular-app/src/app/worksheet.services.ts](https://github.com/luncheon/framework-agnostic-frontend-usecase-example/blob/master/apps/angular-app/src/app/worksheet.services.ts)
 
 ```typescript
 import produce from 'immer'
