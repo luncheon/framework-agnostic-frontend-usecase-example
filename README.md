@@ -153,9 +153,11 @@ export class WorksheetService {
     * Vue.js 3.x でもダメかもしれませんが、おそらく immer を介す理由がなくなります。
 
 
-## スケールアップ： 状態オブジェクトの統合
+## ケーススタディ
 
-複数の状態を統合したくなったら、次の `CombinedState`／`CombinedStateOperations` のような形でシンプルに実現できます。統合される元の状態オブジェクトに変更は要りません。
+### スケールアップ： 状態オブジェクトの統合
+
+複数の状態を統合したくなったら、次の `CombinedState`／`CombinedStateOperations` のような形でシンプルに実現できます。統合元の状態更新ロジックに手を加える必要はありません。（逆に言えば、状態更新ロジックは任意の切り口で分割できます。）
 
 [case-study/CombinedState.ts](https://github.com/luncheon/framework-agnostic-frontend-usecase-example/blob/master/case-study/CombinedState.ts)
 
@@ -198,7 +200,7 @@ export class CombinedStateOperations {
 ```
 
 
-## 非同期処理
+### 非同期処理
 
 状態の更新が必要なタイミングで都度 `update()` を呼ぶようにします。非同期処理前に取得した `state` は非同期処理後には使えません。
 
