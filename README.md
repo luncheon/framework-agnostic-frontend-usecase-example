@@ -155,12 +155,32 @@ export class WorksheetService {
 
 ## スケールアップ： 状態オブジェクトの統合
 
-複数の状態を統合したくなったら、次の `CombinedState`／`CombinedStateOperations` のような形でシンプルに実現できます。
+複数の状態を統合したくなったら、次の `CombinedState`／`CombinedStateOperations` のような形でシンプルに実現できます。統合される元の状態オブジェクトに変更は要りません。
 
 [case-study/CombinedState.ts](https://github.com/luncheon/framework-agnostic-frontend-usecase-example/blob/master/case-study/CombinedState.ts)
 
 ```typescript
 export type Update<T> = (mutate: (state: T) => void) => unknown
+```
+
+```typescript
+export interface FirstState { /* ... */ }
+
+export class FirstStateOperations {
+  constructor(private readonly update: Update<FirstState>) {}
+
+  /* ... */
+}
+```
+
+```typescript
+export interface SecondState { /* ... */ }
+
+export class SecondStateOperations {
+  constructor(private readonly update: Update<SecondState>) {}
+
+  /* ... */
+}
 ```
 
 ```typescript
@@ -177,36 +197,10 @@ export class CombinedStateOperations {
 }
 ```
 
-```typescript
-export interface FirstState {
-  x: number
-}
-
-export class FirstStateOperations {
-  constructor(private readonly update: Update<FirstState>) {}
-
-  setX(x: number) {
-    this.update(state => { state.x = x })
-  }
-}
-```
-
-```typescript
-export interface SecondState {
-  /* ... */
-}
-
-export class SecondStateOperations {
-  constructor(private readonly update: Update<SecondState>) {}
-
-  /* ... */
-}
-```
-
 
 ## 非同期処理
 
-状態の更新が必要なタイミングで都度 `update()` を呼ぶようにします。
+状態の更新が必要なタイミングで都度 `update()` を呼ぶようにします。非同期処理前に取得した `state` は非同期処理後には使えません。
 
 [case-study/AsyncState.ts](https://github.com/luncheon/framework-agnostic-frontend-usecase-example/blob/master/case-study/AsyncState.ts)
 
