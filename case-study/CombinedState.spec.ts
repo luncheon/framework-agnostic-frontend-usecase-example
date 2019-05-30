@@ -1,47 +1,6 @@
 import produce from 'immer'
+import { CombinedState, CombinedStateOperations, createEmptyCombinedState } from './CombinedState'
 
-type Update<T> = (mutate: (state: T) => void) => unknown
-
-interface FirstState {
-  x: number
-}
-
-class FirstStateOperations {
-  constructor(private readonly update: Update<FirstState>) {}
-
-  setX(x: number) {
-    this.update(state => { state.x = x })
-  }
-}
-
-
-interface SecondState {
-  x: number
-}
-
-class SecondStateOperations {
-  constructor(private readonly update: Update<SecondState>) {}
-
-  setX(x: number) {
-    this.update(state => { state.x = x })
-  }
-}
-
-
-interface CombinedState {
-  first: FirstState
-  second: SecondState
-}
-
-class CombinedStateOperations {
-  readonly first = new FirstStateOperations(mutate => this.update(state => mutate(state.first)))
-  readonly second = new SecondStateOperations(mutate => this.update(state => mutate(state.second)))
-
-  constructor(private readonly update: Update<CombinedState>) {}
-}
-
-
-const createEmptyCombinedState = () => ({ first: { x: 1 }, second: { x: 2 } })
 let state: CombinedState = createEmptyCombinedState()
 let initialState = state
 

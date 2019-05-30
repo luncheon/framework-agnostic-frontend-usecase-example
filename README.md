@@ -155,34 +155,34 @@ export class WorksheetService {
 
 ## スケールアップ： 状態オブジェクトの統合
 
-複数の状態を統合したくなったら、次の `CombinedState`／`CombinedStateOperation` のような形でシンプルに実現できます。
+複数の状態を統合したくなったら、次の `CombinedState`／`CombinedStateOperations` のような形でシンプルに実現できます。
 
-[usecase/src/\_\_test\_\_/CombinedState.spec.ts](https://github.com/luncheon/framework-agnostic-frontend-usecase-example/blob/master/usecase/src/__test__/CombinedState.spec.ts)
+[case-study/CombinedState.ts](https://github.com/luncheon/framework-agnostic-frontend-usecase-example/blob/master/case-study/CombinedState.ts)
 
 ```typescript
-type Update<T> = (mutate: (state: T) => void) => unknown
+export type Update<T> = (mutate: (state: T) => void) => unknown
 ```
 
 ```typescript
-interface CombinedState {
+export interface CombinedState {
   first: FirstState
   second: SecondState
 }
 
-class CombinedStateOperation {
-  readonly first = new FirstStateOperation(mutate => this.update(state => mutate(state.first)))
-  readonly second = new SecondStateOperation(mutate => this.update(state => mutate(state.second)))
+export class CombinedStateOperations {
+  readonly first = new FirstStateOperations(mutate => this.update(state => mutate(state.first)))
+  readonly second = new SecondStateOperations(mutate => this.update(state => mutate(state.second)))
 
   constructor(private readonly update: Update<CombinedState>) {}
 }
 ```
 
 ```typescript
-interface FirstState {
+export interface FirstState {
   x: number
 }
 
-class FirstStateOperation {
+export class FirstStateOperations {
   constructor(private readonly update: Update<FirstState>) {}
 
   setX(x: number) {
@@ -192,13 +192,67 @@ class FirstStateOperation {
 ```
 
 ```typescript
-interface SecondState {
+export interface SecondState {
   /* ... */
 }
 
-class SecondStateOperation {
+export class SecondStateOperations {
   constructor(private readonly update: Update<SecondState>) {}
 
   /* ... */
+}
+```
+
+
+## 非同期処理
+
+状態の更新が必要なタイミングで都度 `update()` を呼ぶようにします。
+
+[case-study/AsyncState.ts](https://github.com/luncheon/framework-agnostic-frontend-usecase-example/blob/master/case-study/AsyncState.ts)
+
+```typescript
+export interface AsyncState {
+  url: string
+  loading: boolean
+  value?: any
+  error?: any
+}
+
+export class AsyncOperations {
+  constructor(private readonly update: (mutate: (state: AsyncState) => void) => unknown) {}
+
+  async load() {
+    let url: string | undefined
+    this.update(state => {
+      if (state.loading) {
+        throw Error('loading yet.')
+      }
+      url = state.url
+      state.loading = true
+      state.value = undefined
+      state.error = undefined
+    })
+
+    try {
+      if (!url) {
+        throw Error('url is not specified.')
+      }
+      const response = await fetch(url)
+      const value = await response.json()
+      this.update(state => {
+        state.loading = false
+        if (response.ok) {
+          state.value = value
+        } else {
+          state.error = { status: response.status, value }
+        }
+      })
+    } catch (error) {
+      this.update(state => {
+        state.loading = false
+        state.error = error
+      })
+    }
+  }
 }
 ```
